@@ -21,18 +21,11 @@ jobs:
         run: |
           java -version
           gradle --version
-      - name: Probe Minecraft 26.2 APIs
+      - name: Probe Furnace tick bytecode
         run: |
           gradle -q writeCompileClasspath
           CP="$(cat build/compile-classpath.txt)"
-          for C in \
-            net.minecraft.references.ItemId \
-            net.minecraft.world.item.Item\$Properties \
-            net.minecraft.world.level.block.entity.FuelValues\$Builder \
-            net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity; do
-            echo "=== $C ==="
-            javap -private -classpath "$CP" "$C" || true
-          done
+          javap -c -private -classpath "$CP" net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
       - name: Build
         run: gradle clean build --stacktrace
       - name: Upload JARs
