@@ -23,6 +23,24 @@ jobs:
           gradle --version
       - name: Build
         run: gradle clean build --stacktrace
+      - name: Dedicated server smoke test
+        run: |
+          mkdir -p run
+          echo 'eula=true' > run/eula.txt
+          set +e
+          timeout 60s gradle runServer --args='nogui' > /tmp/fuel-recipe-server.log 2>&1
+          CODE=$?
+          set -e
+          cat /tmp/fuel-recipe-server.log
+          if [ "$CODE" -ne 0 ] && [ "$CODE" -ne 124 ]; then
+            echo "Server exited unexpectedly with code $CODE"
+            exit "$CODE"
+          fi
+          if grep -E -i 'mixin apply failed|failed to load recipe|parsing error|could not parse|exception.*fuelrecipe' /tmp/fuel-recipe-server.log; then
+            echo 'Detected mod/resource loading error.'
+            exit 1
+          fi
+          grep -q 'Done (' /tmp/fuel-recipe-server.log || { echo 'Server never reached ready state.'; exit 1; }
       - name: Upload JARs
         uses: actions/upload-artifact@v4
         with:
