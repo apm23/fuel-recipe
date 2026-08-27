@@ -27,6 +27,7 @@ jobs:
         run: |
           mkdir -p run
           echo 'eula=true' > run/eula.txt
+          echo 'online-mode=false' > run/server.properties
           set +e
           timeout 60s gradle runServer --args='nogui' > /tmp/fuel-recipe-server.log 2>&1
           CODE=$?
@@ -36,7 +37,7 @@ jobs:
             echo "Server exited unexpectedly with code $CODE"
             exit "$CODE"
           fi
-          if grep -E -i 'mixin apply failed|failed to load recipe|parsing error|could not parse|exception.*fuelrecipe' /tmp/fuel-recipe-server.log; then
+          if grep -E -i 'mixin apply failed|failed to load recipe|parsing error|could not parse|exception.*fuelrecipe|crash report' /tmp/fuel-recipe-server.log; then
             echo 'Detected mod/resource loading error.'
             exit 1
           fi
