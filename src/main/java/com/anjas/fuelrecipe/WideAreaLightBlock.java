@@ -13,8 +13,8 @@ final class WideAreaLightBlock extends Block {
     private static final int NODE_SPACING = 12;
     private static final int SEARCH_DISTANCE = 6;
     private static final int LOCAL_ESCAPE_DISTANCE = 12;
-    private static final int PHASE_COUNT = 8;
-    private static final int PHASE_INTERVAL_TICKS = 5;
+    private static final int PHASE_COUNT = 32;
+    private static final int PHASE_INTERVAL_TICKS = 2;
     private final int radius;
 
     WideAreaLightBlock(int radius, BlockBehaviour.Properties properties) {
