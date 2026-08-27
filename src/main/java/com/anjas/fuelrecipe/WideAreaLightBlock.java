@@ -27,6 +27,7 @@ final class WideAreaLightBlock extends Block {
         super.onPlace(state, level, pos, oldState, movedByPiston);
         if (level instanceof ServerLevel serverLevel) {
             placeLocalEscapeNodes(serverLevel, pos);
+            debugAndPlacePositiveXAnchor(serverLevel, pos);
             placeRangeAnchors(serverLevel, pos);
             level.scheduleTick(pos, this, 1);
         }
@@ -47,6 +48,31 @@ final class WideAreaLightBlock extends Block {
         cleanupLocalEscapeNodes(level, pos);
         cleanupRangeAnchors(level, pos);
         super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
+    }
+
+    private void debugAndPlacePositiveXAnchor(ServerLevel level, BlockPos origin) {
+        int distance = (radius / NODE_SPACING) * NODE_SPACING;
+        BlockPos base = origin.offset(distance, 0, 0);
+        boolean loaded = level.isLoaded(base);
+        BlockState before = loaded ? level.getBlockState(base) : Blocks.VOID_AIR.defaultBlockState();
+        BlockPos target = findSafeAir(level, base);
+        boolean set = false;
+        BlockState after = before;
+        if (target != null) {
+            BlockState current = level.getBlockState(target);
+            if (current.isAir() || ModBlocks.isLightNode(current)) {
+                set = level.setBlock(target, ModBlocks.LIGHT_NODE_A.defaultBlockState(), Block.UPDATE_CLIENTS);
+                after = level.getBlockState(target);
+            }
+        }
+        System.out.println("[Fuel Recipe DEBUG] anchor +X radius=" + radius
+            + " distance=" + distance
+            + " base=" + base
+            + " loaded=" + loaded
+            + " before=" + before
+            + " target=" + target
+            + " set=" + set
+            + " after=" + after);
     }
 
     private void placeRangeAnchors(ServerLevel level, BlockPos origin) {
