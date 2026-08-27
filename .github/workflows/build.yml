@@ -38,16 +38,16 @@ jobs:
             echo 'forceload add 0 0 64 0'
             sleep 5
             echo 'say LIGHT_TEST_BEGIN'
-            echo 'setblock 0 101 0 minecraft:amethyst_block'
-            echo 'setblock 0 100 0 fuelrecipe:super_light'
+            echo 'setblock 0 201 0 minecraft:amethyst_block'
+            echo 'setblock 0 200 0 fuelrecipe:super_light'
             sleep 1
-            echo 'execute if block 0 102 0 fuelrecipe:light_node_a run say BURIED_LIGHT_OK'
+            echo 'execute if block 0 202 0 fuelrecipe:light_node_a run say BURIED_LIGHT_OK'
             sleep 8
-            echo 'execute if block 60 100 0 fuelrecipe:light_node_a run say RADIUS_60_OK'
-            echo 'setblock 0 100 0 minecraft:air'
+            echo 'execute if block 60 200 0 fuelrecipe:light_node_a run say RADIUS_60_OK'
+            echo 'setblock 0 200 0 minecraft:air'
             sleep 2
-            echo 'execute unless block 0 102 0 fuelrecipe:light_node_a unless block 0 102 0 fuelrecipe:light_node_b run say LOCAL_CLEANUP_OK'
-            echo 'execute unless block 60 100 0 fuelrecipe:light_node_a unless block 60 100 0 fuelrecipe:light_node_b run say FAR_CLEANUP_OK'
+            echo 'execute unless block 0 202 0 fuelrecipe:light_node_a unless block 0 202 0 fuelrecipe:light_node_b run say LOCAL_CLEANUP_OK'
+            echo 'execute unless block 60 200 0 fuelrecipe:light_node_a unless block 60 200 0 fuelrecipe:light_node_b run say FAR_CLEANUP_OK'
             echo 'stop'
           ) | timeout 80s gradle runServer --args='nogui' > /tmp/fuel-recipe-server.log 2>&1
           CODE=$?
