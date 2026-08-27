@@ -1,5 +1,6 @@
 package com.anjas.fuelrecipe;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -7,6 +8,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -42,6 +44,7 @@ public final class ModBlocks {
     private static Block registerNode(ResourceKey<Block> key) {
         Block block = new LightNodeBlock(
             BlockBehaviour.Properties.of()
+                .air()
                 .noCollision()
                 .noOcclusion()
                 .replaceable()
@@ -67,6 +70,22 @@ public final class ModBlocks {
         return state.is(LIGHT_NODE_A) || state.is(LIGHT_NODE_B);
     }
 
-    public static void initialize() {}
+    private static void verifyInvisibleNodeSafety() {
+        BlockState a = LIGHT_NODE_A.defaultBlockState();
+        BlockState b = LIGHT_NODE_B.defaultBlockState();
+        if (!a.isAir() || !b.isAir()) {
+            throw new IllegalStateException("Fuel Recipe light nodes must behave as air");
+        }
+        if (!a.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).isEmpty()
+            || !b.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).isEmpty()) {
+            throw new IllegalStateException("Fuel Recipe light nodes must have an empty selection shape");
+        }
+        System.out.println("[Fuel Recipe] Invisible light-node targeting self-test passed");
+    }
+
+    public static void initialize() {
+        verifyInvisibleNodeSafety();
+    }
+
     private ModBlocks() {}
 }
