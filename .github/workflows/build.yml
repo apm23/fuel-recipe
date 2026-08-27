@@ -31,7 +31,7 @@ jobs:
           set +e
           (
             sleep 25
-            echo 'forceload add -5 -5 5 5'
+            echo 'forceload add 0 0 64 0'
             echo 'setblock 0 101 0 minecraft:amethyst_block'
             echo 'setblock 0 100 0 fuelrecipe:super_light'
             sleep 1
