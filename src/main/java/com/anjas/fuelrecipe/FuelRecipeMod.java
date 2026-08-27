@@ -10,6 +10,7 @@ public final class FuelRecipeMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        ModBlocks.initialize();
         ModItems.initialize();
         FuelValueEvents.BUILD.register((builder, context) -> {
             builder.add(ModItems.COPPERCHARGED_BAMBOO, COPPERCHARGED_BAMBOO_BURN_TICKS);

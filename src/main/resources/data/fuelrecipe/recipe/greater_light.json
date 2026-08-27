@@ -1,0 +1,7 @@
+{
+  "type":"minecraft:crafting_shaped",
+  "category":"building",
+  "pattern":["TTT","TTT"],
+  "key":{"T":"minecraft:torch"},
+  "result":{"id":"fuelrecipe:greater_light","count":1}
+}

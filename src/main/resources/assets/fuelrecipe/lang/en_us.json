@@ -1,4 +1,7 @@
 {
   "item.fuelrecipe.coppercharged_bamboo":"Coppercharged Bamboo",
-  "item.fuelrecipe.coppercharged_lava_bucket":"Coppercharged Lava Bucket"
+  "item.fuelrecipe.coppercharged_lava_bucket":"Coppercharged Lava Bucket",
+  "block.fuelrecipe.wide_light":"Wide Light",
+  "block.fuelrecipe.greater_light":"Greater Light",
+  "block.fuelrecipe.super_light":"Super Light"
 }
