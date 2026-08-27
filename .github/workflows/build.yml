@@ -32,14 +32,13 @@ jobs:
           (
             sleep 25
             echo 'forceload add 0 0'
-            echo 'fill 1 100 0 7 100 0 minecraft:amethyst_block'
+            echo 'fill 1 100 0 14 100 0 minecraft:amethyst_block'
             echo 'setblock 0 100 0 fuelrecipe:super_light'
             sleep 4
-            echo 'execute if block 8 100 0 fuelrecipe:light_node_a run say LIGHT_NODE_OK'
-            echo 'execute if block 8 100 0 fuelrecipe:light_node_b run say LIGHT_NODE_OK'
+            echo 'execute if block 15 100 0 fuelrecipe:light_node_a run say LIGHT_NODE_OK'
             echo 'setblock 0 100 0 minecraft:air'
-            sleep 6
-            echo 'execute unless block 8 100 0 fuelrecipe:light_node_a unless block 8 100 0 fuelrecipe:light_node_b run say LIGHT_CLEANUP_OK'
+            sleep 2
+            echo 'execute unless block 15 100 0 fuelrecipe:light_node_a unless block 15 100 0 fuelrecipe:light_node_b run say LIGHT_CLEANUP_OK'
             echo 'stop'
           ) | timeout 55s gradle runServer --args='nogui' > /tmp/fuel-recipe-server.log 2>&1
           CODE=$?
@@ -54,7 +53,7 @@ jobs:
             exit 1
           fi
           grep -q 'Done (' /tmp/fuel-recipe-server.log || { echo 'Server never reached ready state.'; exit 1; }
-          grep -q 'LIGHT_NODE_OK' /tmp/fuel-recipe-server.log || { echo 'Wide-area light node did not appear behind the amethyst wall.'; exit 1; }
+          grep -q 'LIGHT_NODE_OK' /tmp/fuel-recipe-server.log || { echo 'Wide-area light node did not appear behind the 14-block amethyst wall.'; exit 1; }
           grep -q 'LIGHT_CLEANUP_OK' /tmp/fuel-recipe-server.log || { echo 'Light node cleanup did not complete.'; exit 1; }
       - name: Upload JARs
         uses: actions/upload-artifact@v4
