@@ -23,6 +23,7 @@ java {
 
 tasks.register('writeCompileClasspath') {
     doLast {
+        mkdir buildDir
         file("$buildDir/compile-classpath.txt").text = configurations.compileClasspath.asPath
     }
 }
