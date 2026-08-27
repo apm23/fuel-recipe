@@ -63,7 +63,7 @@ jobs:
             exit 1
           fi
           grep -q 'Done (' /tmp/fuel-recipe-server.log || { echo 'Server never reached ready state.'; exit 1; }
-          grep -q 'Invisible light-node targeting self-test passed' /tmp/fuel-recipe-server.log || { echo 'Invisible node targeting safety self-test failed.'; exit 1; }
+          grep -q 'Invisible light-node targeting and storage self-test passed' /tmp/fuel-recipe-server.log || { echo 'Invisible node targeting/storage self-test failed.'; exit 1; }
           grep -q 'FAR_CHUNK_LOADED' /tmp/fuel-recipe-server.log || { echo 'Far radius chunk never finished loading.'; exit 1; }
           grep -q 'BURIED_LIGHT_OK' /tmp/fuel-recipe-server.log || { echo 'Buried light failed to illuminate through the amethyst cap.'; exit 1; }
           grep -q 'RADIUS_60_OK' /tmp/fuel-recipe-server.log || { echo 'Super Light did not create a node at 60 blocks.'; exit 1; }
