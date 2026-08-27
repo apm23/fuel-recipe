@@ -27,6 +27,7 @@ final class WideAreaLightBlock extends Block {
         super.onPlace(state, level, pos, oldState, movedByPiston);
         if (level instanceof ServerLevel serverLevel) {
             placeLocalEscapeNodes(serverLevel, pos);
+            placeRangeAnchors(serverLevel, pos);
             level.scheduleTick(pos, this, 1);
         }
     }
@@ -34,6 +35,7 @@ final class WideAreaLightBlock extends Block {
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         placeLocalEscapeNodes(level, pos);
+        placeRangeAnchors(level, pos);
         int phase = Math.floorMod((int) (level.getGameTime() / PHASE_INTERVAL_TICKS), PHASE_COUNT);
         refreshNodes(level, pos, phase);
         level.scheduleTick(pos, this, PHASE_INTERVAL_TICKS);
@@ -43,7 +45,40 @@ final class WideAreaLightBlock extends Block {
     protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
         cleanupLoadedNodes(level, pos);
         cleanupLocalEscapeNodes(level, pos);
+        cleanupRangeAnchors(level, pos);
         super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
+    }
+
+    private void placeRangeAnchors(ServerLevel level, BlockPos origin) {
+        int distance = (radius / NODE_SPACING) * NODE_SPACING;
+        if (distance <= 0) return;
+        placeNodeAt(level, origin.offset(distance, 0, 0));
+        placeNodeAt(level, origin.offset(-distance, 0, 0));
+        placeNodeAt(level, origin.offset(0, distance, 0));
+        placeNodeAt(level, origin.offset(0, -distance, 0));
+        placeNodeAt(level, origin.offset(0, 0, distance));
+        placeNodeAt(level, origin.offset(0, 0, -distance));
+    }
+
+    private static void placeNodeAt(ServerLevel level, BlockPos base) {
+        BlockPos target = findSafeAir(level, base);
+        if (target == null) return;
+        BlockState current = level.getBlockState(target);
+        if (current.is(ModBlocks.LIGHT_NODE_A)) return;
+        if (current.isAir() || ModBlocks.isLightNode(current)) {
+            level.setBlock(target, ModBlocks.LIGHT_NODE_A.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    private void cleanupRangeAnchors(ServerLevel level, BlockPos origin) {
+        int distance = (radius / NODE_SPACING) * NODE_SPACING;
+        if (distance <= 0) return;
+        removeNodeNear(level, origin.offset(distance, 0, 0));
+        removeNodeNear(level, origin.offset(-distance, 0, 0));
+        removeNodeNear(level, origin.offset(0, distance, 0));
+        removeNodeNear(level, origin.offset(0, -distance, 0));
+        removeNodeNear(level, origin.offset(0, 0, distance));
+        removeNodeNear(level, origin.offset(0, 0, -distance));
     }
 
     private void refreshNodes(ServerLevel level, BlockPos origin, int phase) {
