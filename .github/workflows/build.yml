@@ -21,6 +21,13 @@ jobs:
         run: |
           java -version
           gradle --version
+      - name: Probe block APIs
+        run: |
+          gradle -q writeCompileClasspath
+          CP="$(cat build/compile-classpath.txt)"
+          javap -private -classpath "$CP" net.minecraft.world.level.block.Block
+          javap -private -classpath "$CP" net.minecraft.world.level.block.state.BlockBehaviour\$Properties
+          javap -private -classpath "$CP" net.minecraft.server.level.ServerLevel
       - name: Build
         run: gradle clean build --stacktrace
       - name: Dedicated server smoke test
