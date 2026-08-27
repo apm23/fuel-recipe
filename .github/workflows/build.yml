@@ -36,7 +36,8 @@ jobs:
           (
             sleep 25
             echo 'forceload add 0 0 64 0'
-            sleep 5
+            sleep 15
+            echo 'execute if loaded 60 200 0 run say FAR_CHUNK_LOADED'
             echo 'say LIGHT_TEST_BEGIN'
             echo 'setblock 0 201 0 minecraft:amethyst_block'
             echo 'setblock 0 200 0 fuelrecipe:super_light'
@@ -49,7 +50,7 @@ jobs:
             echo 'execute unless block 0 202 0 fuelrecipe:light_node_a unless block 0 202 0 fuelrecipe:light_node_b run say LOCAL_CLEANUP_OK'
             echo 'execute unless block 60 200 0 fuelrecipe:light_node_a unless block 60 200 0 fuelrecipe:light_node_b run say FAR_CLEANUP_OK'
             echo 'stop'
-          ) | timeout 80s gradle runServer --args='nogui' > /tmp/fuel-recipe-server.log 2>&1
+          ) | timeout 95s gradle runServer --args='nogui' > /tmp/fuel-recipe-server.log 2>&1
           CODE=$?
           set -e
           cat /tmp/fuel-recipe-server.log
@@ -63,6 +64,7 @@ jobs:
           fi
           grep -q 'Done (' /tmp/fuel-recipe-server.log || { echo 'Server never reached ready state.'; exit 1; }
           grep -q 'Invisible light-node targeting self-test passed' /tmp/fuel-recipe-server.log || { echo 'Invisible node targeting safety self-test failed.'; exit 1; }
+          grep -q 'FAR_CHUNK_LOADED' /tmp/fuel-recipe-server.log || { echo 'Far radius chunk never finished loading.'; exit 1; }
           grep -q 'BURIED_LIGHT_OK' /tmp/fuel-recipe-server.log || { echo 'Buried light failed to illuminate through the amethyst cap.'; exit 1; }
           grep -q 'RADIUS_60_OK' /tmp/fuel-recipe-server.log || { echo 'Super Light did not create a node at 60 blocks.'; exit 1; }
           grep -q 'LOCAL_CLEANUP_OK' /tmp/fuel-recipe-server.log || { echo 'Local light node cleanup failed.'; exit 1; }
