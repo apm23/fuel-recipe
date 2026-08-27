@@ -44,7 +44,6 @@ public final class ModBlocks {
     private static Block registerNode(ResourceKey<Block> key) {
         Block block = new LightNodeBlock(
             BlockBehaviour.Properties.of()
-                .air()
                 .noCollision()
                 .noOcclusion()
                 .replaceable()
@@ -73,14 +72,14 @@ public final class ModBlocks {
     private static void verifyInvisibleNodeSafety() {
         BlockState a = LIGHT_NODE_A.defaultBlockState();
         BlockState b = LIGHT_NODE_B.defaultBlockState();
-        if (!a.isAir() || !b.isAir()) {
-            throw new IllegalStateException("Fuel Recipe light nodes must behave as air");
+        if (a.isAir() || b.isAir()) {
+            throw new IllegalStateException("Fuel Recipe light nodes must remain storable non-air states");
         }
         if (!a.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).isEmpty()
             || !b.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).isEmpty()) {
             throw new IllegalStateException("Fuel Recipe light nodes must have an empty selection shape");
         }
-        System.out.println("[Fuel Recipe] Invisible light-node targeting self-test passed");
+        System.out.println("[Fuel Recipe] Invisible light-node targeting and storage self-test passed");
     }
 
     public static void initialize() {
