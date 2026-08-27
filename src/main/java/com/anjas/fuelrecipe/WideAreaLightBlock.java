@@ -43,9 +43,10 @@ final class WideAreaLightBlock extends Block {
     private void refreshNodes(ServerLevel level, BlockPos origin, boolean phase) {
         BlockState nodeState = (phase ? ModBlocks.LIGHT_NODE_A : ModBlocks.LIGHT_NODE_B).defaultBlockState();
         int r2 = radius * radius;
-        for (int dx = -radius; dx <= radius; dx += NODE_SPACING) {
-            for (int dy = -radius; dy <= radius; dy += NODE_SPACING) {
-                for (int dz = -radius; dz <= radius; dz += NODE_SPACING) {
+        int extent = (radius / NODE_SPACING) * NODE_SPACING;
+        for (int dx = -extent; dx <= extent; dx += NODE_SPACING) {
+            for (int dy = -extent; dy <= extent; dy += NODE_SPACING) {
+                for (int dz = -extent; dz <= extent; dz += NODE_SPACING) {
                     if (dx == 0 && dy == 0 && dz == 0) continue;
                     if (dx * dx + dy * dy + dz * dz > r2) continue;
                     BlockPos target = findSafeAir(level, origin.offset(dx, dy, dz));
@@ -62,9 +63,10 @@ final class WideAreaLightBlock extends Block {
 
     private void cleanupLoadedNodes(ServerLevel level, BlockPos origin) {
         int r2 = radius * radius;
-        for (int dx = -radius; dx <= radius; dx += NODE_SPACING) {
-            for (int dy = -radius; dy <= radius; dy += NODE_SPACING) {
-                for (int dz = -radius; dz <= radius; dz += NODE_SPACING) {
+        int extent = (radius / NODE_SPACING) * NODE_SPACING;
+        for (int dx = -extent; dx <= extent; dx += NODE_SPACING) {
+            for (int dy = -extent; dy <= extent; dy += NODE_SPACING) {
+                for (int dz = -extent; dz <= extent; dz += NODE_SPACING) {
                     if (dx == 0 && dy == 0 && dz == 0) continue;
                     if (dx * dx + dy * dy + dz * dz > r2) continue;
                     BlockPos base = origin.offset(dx, dy, dz);
