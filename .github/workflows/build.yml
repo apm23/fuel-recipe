@@ -21,6 +21,10 @@ jobs:
         run: |
           java -version
           gradle --version
+      - name: Verify light assets
+        run: |
+          grep -q '"particle"' src/main/resources/assets/fuelrecipe/models/block/greater_light.json
+          grep -q '"particle"' src/main/resources/assets/fuelrecipe/models/block/super_light.json
       - name: Build
         run: gradle clean build --stacktrace
       - name: Dedicated server functional smoke test
@@ -58,6 +62,7 @@ jobs:
             exit 1
           fi
           grep -q 'Done (' /tmp/fuel-recipe-server.log || { echo 'Server never reached ready state.'; exit 1; }
+          grep -q 'Invisible light-node targeting self-test passed' /tmp/fuel-recipe-server.log || { echo 'Invisible node targeting safety self-test failed.'; exit 1; }
           grep -q 'BURIED_LIGHT_OK' /tmp/fuel-recipe-server.log || { echo 'Buried light failed to illuminate through the amethyst cap.'; exit 1; }
           grep -q 'RADIUS_60_OK' /tmp/fuel-recipe-server.log || { echo 'Super Light did not create a node at 60 blocks.'; exit 1; }
           grep -q 'LOCAL_CLEANUP_OK' /tmp/fuel-recipe-server.log || { echo 'Local light node cleanup failed.'; exit 1; }
