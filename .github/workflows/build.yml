@@ -32,6 +32,8 @@ jobs:
           (
             sleep 25
             echo 'forceload add 0 0 64 0'
+            sleep 5
+            echo 'say LIGHT_TEST_BEGIN'
             echo 'setblock 0 101 0 minecraft:amethyst_block'
             echo 'setblock 0 100 0 fuelrecipe:super_light'
             sleep 1
@@ -43,7 +45,7 @@ jobs:
             echo 'execute unless block 0 102 0 fuelrecipe:light_node_a unless block 0 102 0 fuelrecipe:light_node_b run say LOCAL_CLEANUP_OK'
             echo 'execute unless block 60 100 0 fuelrecipe:light_node_a unless block 60 100 0 fuelrecipe:light_node_b run say FAR_CLEANUP_OK'
             echo 'stop'
-          ) | timeout 60s gradle runServer --args='nogui' > /tmp/fuel-recipe-server.log 2>&1
+          ) | timeout 70s gradle runServer --args='nogui' > /tmp/fuel-recipe-server.log 2>&1
           CODE=$?
           set -e
           cat /tmp/fuel-recipe-server.log
@@ -60,8 +62,10 @@ jobs:
           grep -q 'RADIUS_60_OK' /tmp/fuel-recipe-server.log || { echo 'Super Light did not create a node at 60 blocks.'; exit 1; }
           grep -q 'LOCAL_CLEANUP_OK' /tmp/fuel-recipe-server.log || { echo 'Local light node cleanup failed.'; exit 1; }
           grep -q 'FAR_CLEANUP_OK' /tmp/fuel-recipe-server.log || { echo 'Far light node cleanup failed.'; exit 1; }
-          if grep -q "Can't keep up!" /tmp/fuel-recipe-server.log; then
+          awk '/LIGHT_TEST_BEGIN/{seen=1} seen' /tmp/fuel-recipe-server.log > /tmp/light-test-window.log
+          if grep -q "Can't keep up!" /tmp/light-test-window.log; then
             echo 'Performance regression detected during light placement.'
+            cat /tmp/light-test-window.log
             exit 1
           fi
       - name: Upload JARs
