@@ -31,16 +31,19 @@ jobs:
           set +e
           (
             sleep 25
-            echo 'forceload add 0 0'
-            echo 'fill 1 100 0 14 100 0 minecraft:amethyst_block'
+            echo 'forceload add -5 -5 5 5'
+            echo 'setblock 0 101 0 minecraft:amethyst_block'
             echo 'setblock 0 100 0 fuelrecipe:super_light'
+            sleep 1
+            echo 'execute if block 0 102 0 fuelrecipe:light_node_a run say BURIED_LIGHT_OK'
             sleep 4
-            echo 'execute if block 15 100 0 fuelrecipe:light_node_a run say LIGHT_NODE_OK'
+            echo 'execute if block 60 100 0 fuelrecipe:light_node_a run say RADIUS_60_OK'
             echo 'setblock 0 100 0 minecraft:air'
             sleep 2
-            echo 'execute unless block 15 100 0 fuelrecipe:light_node_a unless block 15 100 0 fuelrecipe:light_node_b run say LIGHT_CLEANUP_OK'
+            echo 'execute unless block 0 102 0 fuelrecipe:light_node_a unless block 0 102 0 fuelrecipe:light_node_b run say LOCAL_CLEANUP_OK'
+            echo 'execute unless block 60 100 0 fuelrecipe:light_node_a unless block 60 100 0 fuelrecipe:light_node_b run say FAR_CLEANUP_OK'
             echo 'stop'
-          ) | timeout 55s gradle runServer --args='nogui' > /tmp/fuel-recipe-server.log 2>&1
+          ) | timeout 60s gradle runServer --args='nogui' > /tmp/fuel-recipe-server.log 2>&1
           CODE=$?
           set -e
           cat /tmp/fuel-recipe-server.log
@@ -53,8 +56,14 @@ jobs:
             exit 1
           fi
           grep -q 'Done (' /tmp/fuel-recipe-server.log || { echo 'Server never reached ready state.'; exit 1; }
-          grep -q 'LIGHT_NODE_OK' /tmp/fuel-recipe-server.log || { echo 'Wide-area light node did not appear behind the 14-block amethyst wall.'; exit 1; }
-          grep -q 'LIGHT_CLEANUP_OK' /tmp/fuel-recipe-server.log || { echo 'Light node cleanup did not complete.'; exit 1; }
+          grep -q 'BURIED_LIGHT_OK' /tmp/fuel-recipe-server.log || { echo 'Buried light failed to illuminate through the amethyst cap.'; exit 1; }
+          grep -q 'RADIUS_60_OK' /tmp/fuel-recipe-server.log || { echo 'Super Light did not create a node at 60 blocks.'; exit 1; }
+          grep -q 'LOCAL_CLEANUP_OK' /tmp/fuel-recipe-server.log || { echo 'Local light node cleanup failed.'; exit 1; }
+          grep -q 'FAR_CLEANUP_OK' /tmp/fuel-recipe-server.log || { echo 'Far light node cleanup failed.'; exit 1; }
+          if grep -q "Can't keep up!" /tmp/fuel-recipe-server.log; then
+            echo 'Performance regression detected during light placement.'
+            exit 1
+          fi
       - name: Upload JARs
         uses: actions/upload-artifact@v4
         with:
